@@ -7,26 +7,48 @@
  *
  * Learn more at https://developers.cloudflare.com/workers/
  */
+import { Connection, createConnection } from 'mysql2/promise';
 
 export interface Env {
-	// Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
-	// MY_KV_NAMESPACE: KVNamespace;
-	//
-	// Example binding to Durable Object. Learn more at https://developers.cloudflare.com/workers/runtime-apis/durable-objects/
-	// MY_DURABLE_OBJECT: DurableObjectNamespace;
-	//
-	// Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
-	// MY_BUCKET: R2Bucket;
-	//
-	// Example binding to a Service. Learn more at https://developers.cloudflare.com/workers/runtime-apis/service-bindings/
-	// MY_SERVICE: Fetcher;
-	//
-	// Example binding to a Queue. Learn more at https://developers.cloudflare.com/queues/javascript-apis/
-	// MY_QUEUE: Queue;
+	DATABASE_HOST: string;
+	DATABASE_PORT: number;
+	DATABASE_USER: string;
+	DATABASE_PASSWORD: string;
+	DATABASE_NAME: string;
 }
 
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-		return new Response('Hello World!');
+		try {
+			const tidb = await createConnection({
+				host: '127.0.0.1',
+				port: 4000,
+				user: 'root',
+				password: '',
+				database: 'test',
+				debug: true,
+				useStaticParser: true,
+			});
+			// @ts-ignore
+			const [rows] = await tidb.query('SELECT 1 AS field;');
+			await tidb.end()
+			return new Response(JSON.stringify(rows), { status: 200 });
+		} catch (e: any) {
+			console.error(e);
+			return new Response('Error: ' + e.message, { status: 500 });
+		}
 	},
 };
+//
+// function query(conn: Connection, sql: string) {
+// 	return new Promise((resolve, reject) => {
+// 		conn.query(sql, (err, rows) => {
+// 			if (err) {
+// 				reject(err);
+// 			} else {
+// 				resolve([rows]);
+// 			}
+// 		});
+// 	});
+// }
+

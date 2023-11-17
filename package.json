@@ -9,7 +9,14 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20230419.0",
+    "@types/node": "^20.9.0",
+    "rollup-plugin-node-polyfills": "^0.2.1",
     "typescript": "^5.0.4",
     "wrangler": "^3.0.0"
+  },
+  "dependencies": {
+    "@rollup/plugin-node-resolve": "^15.2.3",
+		"mysql2": "workspace:^",
+    "rollup": "^4.4.1"
   }
 }
