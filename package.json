@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "deploy": "wrangler deploy",
-    "dev": "wrangler dev --env local",
+    "dev": "wrangler dev",
     "start": "wrangler dev"
   },
   "devDependencies": {
@@ -12,11 +12,11 @@
     "@types/node": "^20.9.0",
     "rollup-plugin-node-polyfills": "^0.2.1",
     "typescript": "^5.0.4",
-    "wrangler": "^3.0.0"
+    "wrangler": "^3.16.0"
   },
   "dependencies": {
     "@rollup/plugin-node-resolve": "^15.2.3",
-		"mysql2": "workspace:^",
+    "mysql2": "workspace:^",
     "rollup": "^4.4.1"
   }
 }

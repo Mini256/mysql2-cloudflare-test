@@ -30,7 +30,7 @@ export default {
 				useStaticParser: true,
 			});
 			// @ts-ignore
-			const [rows] = await query(tidb, 'SELECT 1 AS field;');
+			const [rows] = await query(tidb, 'SHOW DATABASES;');
 			tidb.end();
 			return new Response(JSON.stringify(rows), { status: 200 });
 		} catch (e: any) {
