@@ -7,7 +7,7 @@
  *
  * Learn more at https://developers.cloudflare.com/workers/
  */
-import { Connection, createConnection } from 'mysql2';
+import { createConnection } from 'mysql2/promise';
 
 export interface Env {
 	DATABASE_HOST: string;
@@ -15,40 +15,26 @@ export interface Env {
 	DATABASE_USER: string;
 	DATABASE_PASSWORD: string;
 	DATABASE_NAME: string;
+	DATABASE_ENABLE_SSL: string;
 }
 
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-		try {
-			const tidb = createConnection({
-				host: env.DATABASE_HOST,
-				port: 4000,
-				user: env.DATABASE_USER,
-				password: env.DATABASE_PASSWORD,
-				database: env.DATABASE_NAME,
-				debug: true,
-				useStaticParser: true,
-			});
-			// @ts-ignore
-			const [rows] = await query(tidb, 'SHOW DATABASES;');
-			tidb.end();
-			return new Response(JSON.stringify(rows), { status: 200 });
-		} catch (e: any) {
-			console.error(e);
-			return new Response('Error: ' + e.message, { status: 500 });
-		}
+		const conn = await createConnection({
+			host: env.DATABASE_HOST,
+			port: 4000,
+			user: env.DATABASE_USER,
+			password: env.DATABASE_PASSWORD,
+			database: env.DATABASE_NAME,
+			ssl: env.DATABASE_ENABLE_SSL === 'true' ? {
+				rejectUnauthorized: false,
+			} : undefined,
+			debug: false,
+			disableEval: true,
+		});
+		// @ts-ignore
+		const [rows] = await conn.query('SHOW DATABASES;');
+		conn.end();
+		return Response.json(rows);
 	},
 };
-
-function query(conn: Connection, sql: string) {
-	return new Promise((resolve, reject) => {
-		conn.query(sql, (err, rows) => {
-			if (err) {
-				reject(err);
-			} else {
-				resolve([rows]);
-			}
-		});
-	});
-}
-
